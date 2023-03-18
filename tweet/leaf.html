@@ -1,0 +1,70 @@
+
+<html>
+<link rel="stylesheet" href="leaf.css"/>
+<script src="leaflet.js" ></script>
+<style>
+#map { height: 780px; }
+</style>
+<body>
+<div id="map"></div>
+</body>
+</html>
+<script>
+var myMap = L.map('map', {
+    crs: L.CRS.EPSG4326
+}).setView([51.505, -0.09], 2);;
+/*
+var wmsLayer = L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+    layers: 'TOPO-OSM-WMS'
+}).addTo(myMap);
+*/
+// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//   attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+//   maxZoom: 18
+// }).addTo(myMap);
+
+var wmsLayer = L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+    layers: 'SRTM30-Colored-Hillshade'
+}).addTo(myMap);
+
+
+//fetch('https://pkgstore.datahub.io/examples/geojson-tutorial/example/data/db696b3bf628d9a273ca9907adcea5c9/example.geojson')
+//fetch('http://localhost/tweet/testing.php')
+fetch('http://localhost/tweet/training.php')
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(data) {
+  data=data;
+  console.log(data);
+  console.log(data);
+var geojsonMarkerOptions = {
+    radius: 8,
+    fillColor: "#ff7800",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
+L.geoJson(data, {
+onEachFeature: function(feature, layer) {
+// Add a click listener to the layer to display information about the feature
+layer.on('click', function() {
+// alert('Feature ID: ' + feature.id);
+var popupContent = '<h2>' + feature.properties.name + '</h2>' +
+'<p>' + feature.properties.tweet + '</p>';
+layer.bindPopup(popupContent);
+});
+}
+    }
+,{
+    pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, geojsonMarkerOptions);
+    },
+}).addTo(myMap);
+
+  });
+
+</script>
+
